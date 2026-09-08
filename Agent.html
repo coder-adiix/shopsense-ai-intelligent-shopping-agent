@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ShopSense AI | Intelligent Shopping Agent</title>
+  <meta name="description" content="ShopSense AI is an intelligent shopping agent that compares products, reviews, prices and preferences." />
+
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #f7f8fc;
+      --card: rgba(255,255,255,.86);
+      --text: #151827;
+      --muted: #687087;
+      --primary: #635bff;
+      --secondary: #8b5cf6;
+      --border: #e7e8f0;
+      --shadow: 0 18px 55px rgba(36, 31, 82, .12);
+    }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at 10% 10%, rgba(99,91,255,.12), transparent 28%),
+        radial-gradient(circle at 90% 15%, rgba(139,92,246,.12), transparent 25%),
+        var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+    a { color: inherit; text-decoration: none; }
+    button, input, select { font: inherit; }
+    .container { width: min(1160px, 92%); margin: auto; }
+
+    nav {
+      position: sticky; top: 0; z-index: 20;
+      backdrop-filter: blur(16px);
+      background: rgba(247,248,252,.78);
+      border-bottom: 1px solid rgba(231,232,240,.8);
+    }
+    .nav-inner {
+      height: 72px; display: flex; align-items: center; justify-content: space-between;
+    }
+    .logo { display:flex; align-items:center; gap:10px; font-weight:800; font-size:1.15rem; }
+    .logo-mark {
+      width:38px; height:38px; border-radius:12px; display:grid; place-items:center;
+      color:white; background:linear-gradient(135deg,var(--primary),var(--secondary));
+      box-shadow: 0 8px 20px rgba(99,91,255,.28);
+    }
+    .nav-links { display:flex; gap:26px; color:var(--muted); font-size:.95rem; }
+    .nav-links a:hover { color:var(--primary); }
+    .nav-btn {
+      border:0; color:white; background:var(--text); padding:10px 17px; border-radius:12px;
+      cursor:pointer; font-weight:700;
+    }
+
+    .hero { padding: 88px 0 70px; }
+    .hero-grid { display:grid; grid-template-columns: 1.08fr .92fr; gap:60px; align-items:center; }
+    .badge {
+      display:inline-flex; gap:8px; align-items:center; padding:8px 13px;
+      border:1px solid #dddff1; border-radius:999px; background:white; color:var(--primary);
+      font-weight:700; font-size:.85rem; box-shadow:0 8px 25px rgba(40,40,80,.05);
+    }
+    h1 { font-size:clamp(2.7rem, 6vw, 5rem); line-height:1.02; letter-spacing:-.055em; margin:20px 0; }
+    .gradient { background:linear-gradient(90deg,var(--primary),var(--secondary)); -webkit-background-clip:text; background-clip:text; color:transparent; }
+    .hero p { color:var(--muted); max-width:620px; font-size:1.08rem; }
+    .hero-actions { display:flex; gap:14px; margin-top:30px; flex-wrap:wrap; }
+    .btn {
+      border:0; border-radius:14px; padding:14px 21px; cursor:pointer; font-weight:800;
+      transition:.2s transform,.2s box-shadow;
+    }
+    .btn:hover { transform:translateY(-2px); }
+    .btn-primary { color:white; background:linear-gradient(135deg,var(--primary),var(--secondary)); box-shadow:0 12px 28px rgba(99,91,255,.28); }
+    .btn-light { background:white; border:1px solid var(--border); }
+
+    .agent-card {
+      background:var(--card); border:1px solid rgba(255,255,255,.8); border-radius:28px;
+      padding:22px; box-shadow:var(--shadow); backdrop-filter:blur(18px);
+      transform:rotate(1deg);
+    }
+    .window-top { display:flex; gap:7px; margin-bottom:18px; }
+    .dot { width:9px; height:9px; border-radius:50%; background:#d7d9e4; }
+    .chat { display:flex; flex-direction:column; gap:14px; }
+    .message { padding:13px 15px; border-radius:16px; font-size:.9rem; }
+    .user { align-self:flex-end; background:#ecebff; color:#4f47c9; }
+    .ai { background:#fff; border:1px solid var(--border); }
+    .recommendation { display:grid; grid-template-columns:55px 1fr auto; gap:12px; align-items:center; margin-top:8px; }
+    .product-icon {
+      width:55px; height:55px; display:grid; place-items:center; border-radius:15px;
+      background:linear-gradient(135deg,#eef0ff,#f7efff); font-size:1.6rem;
+    }
+    .stars { color:#f5a623; font-size:.8rem; }
+    .price { font-weight:900; color:var(--primary); }
+    .mini-btn { border:0; background:#151827; color:white; padding:7px 10px; border-radius:9px; cursor:pointer; font-size:.76rem; }
+
+    section { padding:78px 0; }
+    .section-head { text-align:center; max-width:700px; margin:0 auto 42px; }
+    .eyebrow { color:var(--primary); font-weight:800; text-transform:uppercase; letter-spacing:.12em; font-size:.75rem; }
+    h2 { font-size:clamp(2rem,4vw,3.1rem); line-height:1.1; margin:10px 0 13px; letter-spacing:-.035em; }
+    .section-head p { color:var(--muted); }
+
+    .features { display:grid; grid-template-columns:repeat(3,1fr); gap:18px; }
+    .feature {
+      background:white; border:1px solid var(--border); border-radius:22px; padding:26px;
+      transition:.25s; 
+    }
+    .feature:hover { transform:translateY(-5px); box-shadow:var(--shadow); }
+    .feature-icon { font-size:1.8rem; margin-bottom:13px; }
+    .feature h3 { margin-bottom:7px; }
+    .feature p { color:var(--muted); font-size:.92rem; }
+
+    .demo {
+      background:#151827; color:white; border-radius:32px; padding:36px;
+      box-shadow:0 24px 70px rgba(21,24,39,.2);
+    }
+    .demo-grid { display:grid; grid-template-columns:.8fr 1.2fr; gap:30px; align-items:start; }
+    .demo-copy p { color:#b7bbcc; }
+    .search-box { display:flex; gap:10px; margin-top:24px; }
+    .search-box input {
+      flex:1; padding:15px 16px; border-radius:13px; border:1px solid #34384a;
+      background:#202437; color:white; outline:none;
+    }
+    .search-box input:focus { border-color:#807aff; }
+    .results { display:grid; grid-template-columns:repeat(2,1fr); gap:12px; }
+    .result {
+      background:#202437; border:1px solid #34384a; border-radius:18px; padding:17px;
+      transition:.2s;
+    }
+    .result:hover { border-color:#817aff; transform:translateY(-2px); }
+    .result-top { display:flex; justify-content:space-between; gap:10px; }
+    .result h3 { font-size:1rem; }
+    .score { background:#dff8ea; color:#157347; padding:4px 8px; border-radius:8px; font-size:.75rem; font-weight:900; white-space:nowrap; }
+    .result p { color:#aeb3c5; font-size:.8rem; margin:7px 0 12px; }
+    .tags { display:flex; gap:6px; flex-wrap:wrap; }
+    .tag { padding:4px 7px; border-radius:7px; background:#2a2e42; color:#cbd0df; font-size:.7rem; }
+
+    .steps { display:grid; grid-template-columns:repeat(4,1fr); gap:15px; }
+    .step { text-align:center; padding:20px; }
+    .num {
+      width:45px; height:45px; margin:0 auto 14px; display:grid; place-items:center;
+      border-radius:50%; background:#ecebff; color:var(--primary); font-weight:900;
+    }
+    .step p { color:var(--muted); font-size:.88rem; }
+
+    .cta {
+      text-align:center; background:linear-gradient(135deg,#ecebff,#f7edff);
+      border:1px solid #e1ddff; border-radius:30px; padding:55px 25px;
+    }
+    .cta p { color:var(--muted); margin:10px auto 23px; max-width:620px; }
+
+    footer { padding:30px 0; color:var(--muted); font-size:.85rem; text-align:center; }
+
+    .toast {
+      position:fixed; right:20px; bottom:20px; z-index:50; background:#151827; color:white;
+      padding:13px 17px; border-radius:12px; box-shadow:var(--shadow); transform:translateY(100px);
+      opacity:0; transition:.3s;
+    }
+    .toast.show { transform:translateY(0); opacity:1; }
+
+    @media(max-width:850px) {
+      .hero-grid,.demo-grid { grid-template-columns:1fr; }
+      .features { grid-template-columns:1fr; }
+      .steps { grid-template-columns:repeat(2,1fr); }
+      .nav-links { display:none; }
+      .agent-card { transform:none; }
+    }
+    @media(max-width:560px) {
+      .hero { padding-top:55px; }
+      .results { grid-template-columns:1fr; }
+      .steps { grid-template-columns:1fr; }
+      .demo { padding:22px; }
+      h1 { font-size:2.8rem; }
+    }
+  </style>
+</head>
+
+<body>
+  <nav>
+    <div class="container nav-inner">
+      <a class="logo" href="#home">
+        <span class="logo-mark">✦</span>
+        ShopSense AI
+      </a>
+      <div class="nav-links">
+        <a href="#features">Features</a>
+        <a href="#demo">Demo</a>
+        <a href="#how">How it works</a>
+      </div>
+      <button class="nav-btn" onclick="scrollToDemo()">Try Agent</button>
+    </div>
+  </nav>
+
+  <main id="home">
+    <section class="hero">
+      <div class="container hero-grid">
+        <div>
+          <span class="badge">🤖 AI-powered shopping companion</span>
+          <h1>Shop smarter.<br><span class="gradient">Decide faster.</span></h1>
+          <p>
+            An intelligent shopping agent that understands your needs, compares products,
+            analyzes reviews, tracks value, and helps you make confident buying decisions.
+          </p>
+          <div class="hero-actions">
+            <button class="btn btn-primary" onclick="scrollToDemo()">Start Shopping ✨</button>
+            <a class="btn btn-light" href="#features">Explore Features</a>
+          </div>
+        </div>
+
+        <div class="agent-card">
+          <div class="window-top">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          </div>
+          <div class="chat">
+            <div class="message user">I need wireless headphones under ₹5,000 with good battery life.</div>
+            <div class="message ai">
+              <strong>Got it! I found 3 strong matches.</strong>
+              <div class="recommendation">
+                <div class="product-icon">🎧</div>
+                <div>
+                  <strong>SoundMax Pro</strong>
+                  <div class="stars">★★★★★ <span style="color:#85899a;">4.7/5</span></div>
+                  <span class="price">₹3,999</span>
+                </div>
+                <button class="mini-btn" onclick="showToast('Best match selected!')">Best</button>
+              </div>
+            </div>
+            <div class="message ai">💡 Best for you: high battery life + strong reviews + fits your budget.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="features">
+      <div class="container">
+        <div class="section-head">
+          <span class="eyebrow">Why ShopSense?</span>
+          <h2>Your personal AI shopping strategist.</h2>
+          <p>Less searching. Less confusion. More confidence.</p>
+        </div>
+
+        <div class="features">
+          <article class="feature">
+            <div class="feature-icon">🧠</div>
+            <h3>Personalized Decisions</h3>
+            <p>Understands budget, preferences, urgency and priorities instead of giving generic recommendations.</p>
+          </article>
+          <article class="feature">
+            <div class="feature-icon">📊</div>
+            <h3>Smart Comparison</h3>
+            <p>Compare price, ratings, features and value in one simple view so you can spot the best option quickly.</p>
+          </article>
+          <article class="feature">
+            <div class="feature-icon">⭐</div>
+            <h3>Review Intelligence</h3>
+            <p>Summarizes customer sentiment and highlights useful pros, cons and common concerns.</p>
+          </article>
+          <article class="feature">
+            <div class="feature-icon">💰</div>
+            <h3>Value Tracking</h3>
+            <p>Looks beyond the sticker price and helps identify products that deliver stronger overall value.</p>
+          </article>
+          <article class="feature">
+            <div class="feature-icon">⚡</div>
+            <h3>Fast Shortlisting</h3>
+            <p>Turns hundreds of choices into a focused shortlist that matches what actually matters to you.</p>
+          </article>
+          <article class="feature">
+            <div class="feature-icon">🌱</div>
+            <h3>Context Aware</h3>
+            <p>Can consider factors such as sustainability, delivery urgency and long-term usefulness.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="demo">
+      <div class="container">
+        <div class="demo">
+          <div class="demo-grid">
+            <div class="demo-copy">
+              <span class="eyebrow" style="color:#9c96ff;">Interactive demo</span>
+              <h2>Tell the agent what you need.</h2>
+              <p>Try a product request below. The demo filters a sample product catalog instantly.</p>
+
+              <div class="search-box">
+                <input id="searchInput" type="text" placeholder="e.g. laptop under ₹60,000" oninput="filterProducts()" />
+                <button class="btn btn-primary" onclick="filterProducts()">Search</button>
+              </div>
+            </div>
+
+            <div class="results" id="results"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="how">
+      <div class="container">
+        <div class="section-head">
+          <span class="eyebrow">Simple process</span>
+          <h2>From “What should I buy?” to “This is the one.”</h2>
+        </div>
+        <div class="steps">
+          <div class="step"><div class="num">01</div><h3>Tell us</h3><p>Describe your product, budget and priorities.</p></div>
+          <div class="step"><div class="num">02</div><h3>AI analyzes</h3><p>Products and signals are evaluated against your needs.</p></div>
+          <div class="step"><div class="num">03</div><h3>Compare</h3><p>See a clear shortlist with scores and trade-offs.</p></div>
+          <div class="step"><div class="num">04</div><h3>Decide</h3><p>Choose confidently with the important details in one place.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="container">
+        <div class="cta">
+          <span class="badge">✨ Built for smarter shopping</span>
+          <h2>Stop scrolling. Start deciding.</h2>
+          <p>ShopSense AI turns product overload into a simple, personalized shopping experience.</p>
+          <button class="btn btn-primary" onclick="scrollToDemo()">Try the Demo →</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    © 2026 ShopSense AI · Intelligent Shopping Agent · Demo website
+  </footer>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    const products = [
+      {name:"NovaBook Air 14", category:"Laptop", price:54999, score:94, icon:"💻", desc:"Lightweight laptop with strong everyday performance.", tags:["₹54,999","16GB RAM","512GB SSD"]},
+      {name:"PixelCore X15", category:"Laptop", price:62999, score:91, icon:"💻", desc:"Performance-focused laptop for coding and productivity.", tags:["₹62,999","16GB RAM","1TB SSD"]},
+      {name:"SoundMax Pro", category:"Headphones", price:3999, score:97, icon:"🎧", desc:"Long battery life with active noise cancellation.", tags:["₹3,999","40h battery","ANC"]},
+      {name:"BassFlow 700", category:"Headphones", price:2999, score:88, icon:"🎧", desc:"Balanced sound and comfortable everyday design.", tags:["₹2,999","35h battery","Fast charge"]},
+      {name:"FitTrack Pulse", category:"Smartwatch", price:4499, score:93, icon:"⌚", desc:"Fitness tracking, notifications and bright display.", tags:["₹4,499","AMOLED","7-day battery"]},
+      {name:"VisionTab 11", category:"Tablet", price:21999, score:90, icon:"📱", desc:"Large display designed for study and entertainment.", tags:["₹21,999","11-inch","128GB"]}
+    ];
+
+    function renderProducts(list) {
+      const results = document.getElementById("results");
+      if (!list.length) {
+        results.innerHTML = '<div class="result" style="grid-column:1/-1;"><h3>No exact demo match</h3><p>Try “laptop”, “headphones”, “watch”, “tablet”, or a budget such as ₹5000.</p></div>';
+        return;
+      }
+      results.innerHTML = list.map(p => `
+        <article class="result">
+          <div class="result-top">
+            <div>
+              <div style="font-size:1.5rem">${p.icon}</div>
+              <h3>${p.name}</h3>
+            </div>
+            <span class="score">${p.score}% match</span>
+          </div>
+          <p>${p.desc}</p>
+          <div class="tags">${p.tags.map(t => `<span class="tag">${t}</span>`).join("")}</div>
+        </article>
+      `).join("");
+    }
+
+    function filterProducts() {
+      const q = document.getElementById("searchInput").value.toLowerCase().trim();
+      const budgetMatch = q.match(/(?:under|below|less than|₹)\s*([0-9,]+)/);
+      const budget = budgetMatch ? Number(budgetMatch[1].replace(/,/g,"")) : Infinity;
+
+      const words = q.replace(/[₹,]/g," ").split(/\s+/).filter(Boolean);
+      const list = products
+        .filter(p => p.price <= budget)
+        .map(p => {
+          const searchable = `${p.name} ${p.category} ${p.desc} ${p.tags.join(" ")}`.toLowerCase();
+          const hits = words.filter(w => searchable.includes(w)).length;
+          return {...p, hits};
+        })
+        .filter(p => !q || p.hits > 0 || (budgetMatch && p.price <= budget))
+        .sort((a,b) => b.hits - a.hits || b.score - a.score);
+
+      renderProducts(list.slice(0,4));
+    }
+
+    function scrollToDemo() {
+      document.getElementById("demo").scrollIntoView({behavior:"smooth"});
+      setTimeout(() => document.getElementById("searchInput").focus(), 600);
+    }
+
+    function showToast(message) {
+      const toast = document.getElementById("toast");
+      toast.textContent = message;
+      toast.classList.add("show");
+      setTimeout(() => toast.classList.remove("show"), 2200);
+    }
+
+    renderProducts(products.slice(0,4));
+  </script>
+<script>
+  window.wxOConfiguration = {
+    orchestrationID: "ba6546472113476bba29ccd205b750af_22288d89-b0f9-4c81-8929-0069865d2c22",
+    hostURL: "https://au-syd.watson-orchestrate.cloud.ibm.com",
+    rootElementID: "root",
+    deploymentPlatform: "ibmcloud",
+    crn: "crn:v1:bluemix:public:watsonx-orchestrate:au-syd:a/ba6546472113476bba29ccd205b750af:22288d89-b0f9-4c81-8929-0069865d2c22::",
+    chatOptions: {
+        agentId: "f391f365-2999-4273-9918-fa87a88808a7", 
+    }
+  };
+  setTimeout(function () {
+    const script = document.createElement('script');
+    script.src = `${window.wxOConfiguration.hostURL}/wxochat/wxoLoader.js?embed=true`;
+    script.addEventListener('load', function () {
+        wxoLoader.init();
+    });
+    document.head.appendChild(script);
+  }, 0);                     
+</script>
+</body>
+</html>
