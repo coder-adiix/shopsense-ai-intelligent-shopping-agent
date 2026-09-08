@@ -166,7 +166,7 @@ Instead of only showing products based on keywords, the concept focuses on under
 
 
 ```text
-![ShopSense AI Homepage](screenshots/homepage.png)
+![Screenshot 2026-09-04 163501.png)
 ![Interactive Demo](screenshots/demo.png)
 ```
 
